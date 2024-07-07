@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Посторение графика функции</h1>
+<div>
+    <form method="post">
+        {% csrf_token %}
+        <label for="formula">Введите функцию:</label>
+        <input type="text" name="formula" id="formula" required>
+        <br>
+        <label for="min">Введите левую границу:</label>
+        <input type="number" name="min" id="min" value="-10">
+        <label for="max">Введите правую границу:</label>
+        <input type="number" name="max" id="max" value="10">
+        <input type="submit" name="sub" id="sub" value="Отправить">
+    </form>
+</div>
+{% if error %}
+    <h1>ERROR! Try again!</h1>
+{% else %}
+    <img src="{{filename}}" alt="{{formula}}">
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% extends 'Dalnoboy/base.html' %}
+
+
+
+<div>
+    <!-- Таблица -->
+    {% block content %}
+    <!-- Размещаем график в центре и на полной ширине -->
+    <div style="text-align: center;">
+        <img src="data:image/png;base64,{{ car_graphic }}" alt="График пробега автомобилей" style="width: 100%; max-width: 800px; margin-top: 50px;">
+    </div>
+    
+    {% endblock %}
+</div>
+

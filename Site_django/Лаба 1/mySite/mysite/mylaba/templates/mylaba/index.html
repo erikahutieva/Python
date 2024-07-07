@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'mylaba/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'mylaba/css/table.css' %}">
+    <link rel="stylesheet" href="{% static 'mylaba/css/product.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'home' %}" class="logo">MyLaba</a>
+        <div class="header-right">
+            {% for m in menu %}
+                {% if m.url_name == site %}
+                    <a class="active" href="{% url m.url_name %}">{{ m.title }}</a>
+                {% else %}
+                    <a href="{% url m.url_name %}">{{ m.title }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <h1>{{title}}</h1>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

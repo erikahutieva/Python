@@ -1,0 +1,46 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'mylaba/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'mylaba/css/table.css' %}">
+    <link rel="stylesheet" href="{% static 'mylaba/css/product.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'home' %}" class="logo">MyLaba</a>
+        <div class="header-right">
+            {% for m in menu %}
+                {% if m.url_name == site %}
+                    <a class="active" href="{% url m.url_name %}">{{ m.title }}</a>
+                {% else %}
+                    <a href="{% url m.url_name %}">{{ m.title }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% block content %}
+        <div class="container">
+            <div class="product">
+                <div class="product-image">
+                    <img src="{{ product.photo.url }}" alt="{{ product.name }}">
+                </div>
+                <div class="product-details">
+                    <h2 class="product-name">{{ product.name }}</h2>
+                    <p>{{ product.description }}</p>
+                    <p>Цена: {{product.price}} ₽</p>
+                    <form method="post">
+                        {% csrf_token %}
+                      <label for="quantity">Количество:</label>
+                      <input type="number" id="quantity" name="quantity" min="0" max="{{product.total_amount}}" value="1">
+                      <button type="submit" id="add_to_cart" name="add_to_cart" value="add_to_cart">Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colored Table</title>
+    <style>
+        table, th, td {
+          border: 1px solid black;
+          border-radius: 10px;
+          text-align: center;
+        }
+        table {
+            width: 100%
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Код</th>
+                <th>Наименование</th>
+                <th>Четность числа</th>
+                <th>Счет Учета</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for good in selected_goods %}
+            <tr>
+                <td>{{ good.code }}</td>
+                <td>{{ good.name }}</td>
+                <td style="{{ good.color2 }}">{{ good.even_number}}</td>
+                <td style="{{ good.color }}">{{ good.sschet }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'home' %}">Back to Index</a>
+</body>
+</html>

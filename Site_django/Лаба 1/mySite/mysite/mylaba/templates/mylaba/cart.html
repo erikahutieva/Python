@@ -1,0 +1,61 @@
+{% extends 'mylaba/index.html '%}
+
+{% block content %}
+	{% if error %}
+		<h2 align="center">Произошла ошибка</h2>
+	{%endif%}
+    <div class="cart">
+		{% if cartitems != '' %}
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Название товара</th>
+					<th>Цена</th>
+					<th>Количество</th>
+					<th>Итого</th>
+					<th>Удалить</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in cartitems %}
+					<tr>
+						<td>{{item.name}}</td>
+						<td>{{item.price}}</td>
+						<td>{{item.quantity}}</td>
+						<td>{{item.line_total}} ₽</td>
+						<td align="center"><a href="{% url 'remove_from_cart' item.product_id %}">X</a></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="3"><b>Общая стоимость</b></td>
+					<td><b>{{total_amount}} ₽</b></td>
+					<td></td>
+				</tr>
+			</tfoot>
+		</table>
+		<a href="{% url 'clear_cart' %}">Очистить корзину</a>
+    </div>
+	<form method="post">
+		{% csrf_token %}
+		<label for="payment">Введите способ оплаты: </label>
+		<select name="payment" id="payment" required>
+			<option disabled selected value="">------</option>
+			<option value="no-cash">Безналичный расчет</option>
+			<option value="cash">Наличный расчет</option>
+			<option value="credit">Кредит</option>
+<!--			<option value="barter">Брартер</option>-->
+			<option value="offsetting">Взаимозачет</option>
+		</select>
+		<br>
+		<label for="user_id">Введите пользователя: </label>
+		<input type="number" id="user_id" name="user_id" required>
+		<br>
+		<input type="submit" value="Отправить">
+	</form>
+	{% else %}
+		<h2>Корзина пустая</h2>
+		<a href="{% url 'categories' %}">Перейти к покупкам</a>
+	{% endif %}
+{% endblock %}

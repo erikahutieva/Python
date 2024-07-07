@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Панель заместителя директора</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #header {
+      background-color: #444;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    #container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #sidebar {
+      width: 25%;
+      background-color: #ccc;
+      padding: 10px;
+    }
+
+    #main {
+      width: 75%;
+      padding: 10px;
+    }
+
+    #buttons {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    button {
+      padding: 10px;
+      margin: 5px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .disabled-button {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .graph {
+      height: 200px;
+      width: 200px;
+      background-color: #ccc;
+      border: 1px solid black;
+      border-radius: 5px;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: space-around;
+      padding-top: 5px;
+    }
+
+    .legend-item {
+      width: 100px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="{% url 'home' %}"><button> назад </button></a>
+  <div id="header">
+    <h1>Панель заместителя директора</h1>
+  </div>
+
+  <div id="container">
+    <div id="sidebar">
+      <h2>Меню</h2>
+      <ul>
+        <li><a href="#">Пользователи</a></li>
+        <li><a href="#">Проекты</a></li>
+        <li><a href="#">Отчеты</a></li>
+      </ul>
+
+      <div id="buttons">
+        <button class="disabled-button" id="add-user-btn">
+          <i class="fa fa-lock"></i> Добавить пользователя
+        </button>
+        <button class="disabled-button" id="delete-user-btn">
+          <i class="fa fa-lock"></i> Удалить пользователя
+        </button>
+        <button id="generate-report-btn">Сгенерировать отчет</button>
+      </div>
+    </div>
+
+    <div id="main">
+      <h2>Производительность пользователей</h2>
+
+      <div class="graph">
+        <!-- Рисование графика -->
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <span style="color: red">Низкая</span>
+        </div>
+        <div class="legend-item">
+          <span style="color: orange">Средняя</span>
+        </div>
+        <div class="legend-item">
+          <span style="color: green">Высокая</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Функции для обработки событий
+
+    document.getElementById("generate-report-btn").addEventListener("click", function () {
+      // Генерация отчета
+    });
+
+    // Рисование графика
+
+    // Пример данных графика
+    const data = [
+      {
+        user: "Иван Иванов",
+        productivity: 0.7
+      },
+      {
+        user: "Петр Петров",
+        productivity: 0.5
+      },
+      {
+        user: "Мария Мариина",
+        productivity: 0.9
+      }
+    ];
+
+    // Рисование графика
+    const graph = document.querySelector(".graph");
+    const ctx = graph.getContext("2d");
+
+    // Настройка графика
+    ctx.beginPath();
+    ctx.arc(100, 100, 90, 0, Math.PI * 2);
+    ctx.fillStyle = "#ccc";
+    ctx.fill();
+
+    // Рисование секторов графика
+    for (let i = 0; i < data.length; i++) {
+      const angle = data[i].productivity * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(100, 100);
+      ctx.lineTo(100 + 90 * Math.cos(angle), 100 + 90 * Math.sin(angle));
+      ctx.arc(100, 100, 90, 0, angle);
+      ctx.closePath();
+      ctx.fillStyle = i === 0 ? "red" : i === 1 ? "orange" : "green";
+      ctx.fill();
+    }
+  </script>
+</body>
+
+</html>

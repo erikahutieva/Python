@@ -1,0 +1,50 @@
+{% extends 'mylaba/index.html '%}
+
+
+
+{% block content %}
+<!--<div>-->
+<!--    <form role="search" method="get">-->
+<!--        <input type="search" name="q" id="searchbar" placeholder="Введите фамилию человека">-->
+<!--        <input type="submit" value="Поиск">-->
+<!--    </form>-->
+<!--</div>-->
+<div class="search-container">
+    <form role="search" method="get">
+        <input type="text" placeholder="Search.." name="q" id="searchbar">
+        <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+</div>
+{% if users|length != 0 %}
+<div>
+    <table border="1px solid black" width="100%" class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Фамилия</th>
+                <th>Возраст</th>
+                <th>Сумма покупок</th>
+                <th>Текущий счёт</th>
+                <th>Кредитный лимит</th>
+                <th>Долг</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td><a href="{{ user.get_absolute_url }}">{{user.id}}</a></td>
+                    <td>{{user.name}}</td>
+                    <td>{{user.surname}}</td>
+                    <td>{{user.age}}</td>
+                    <td>{{user.total_purchase}}</td>
+                    <td>{{user.account}}</td>
+                    <td>{{user.loan_limit}}</td>
+                    <td>{{user.loan_balance}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

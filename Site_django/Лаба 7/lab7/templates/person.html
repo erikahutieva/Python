@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Регистрация</h1>
+  {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+  {% endfor %}
+  <form method="post" action="{% url 'person_view' %}">
+    {% csrf_token %}
+    <div>
+      <label>Фамилия:</label>
+      <input type="text" name="last_name" required>
+      <label>Имя:</label>
+      <input type="text" name="first_name" required>
+      <label>Отчество:</label>
+      <input type="text" name="middle_name" required>
+    </div>
+
+    <div>
+      <label>ИНН:</label>
+      <input type="text" name="inn" required>
+    </div>
+    <button type="submit">Добавить</button>
+  </form>
+
+  <hr>
+
+  <h2>Получить ФИО по ИНН</h2>
+  <form method="post" action="{% url 'get_inn' %}">
+    {% csrf_token %}
+    <div>
+      <label>ИНН:</label>
+      <input type="text" name="inn" required>
+    </div>
+    <button type="submit">Получить ФИО</button>
+  </form>
+
+  <hr>
+
+  <h2>Список людей</h2>
+  <ul>
+
+  </ul>
+  <table>
+    <thead>
+        <tr>
+          <th>ФИО</th>
+          <th>ИНН</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for person in people %}
+          <tr>
+            <td>{{ person }}</td>
+            <td>{{ person.inn }}</td>
+          </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

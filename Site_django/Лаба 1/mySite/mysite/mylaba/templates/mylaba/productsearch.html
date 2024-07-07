@@ -1,0 +1,50 @@
+{% extends 'mylaba/index.html '%}
+{% load static %}
+
+
+{% block content %}
+
+<!--<div>-->
+<!--    <form role="search" method="get">-->
+<!--        <input type="search" name="q" id="searchbar" placeholder="Введите название товара">-->
+<!--        <input type="submit" value="Поиск">-->
+<!--    </form>-->
+<!--</div>-->
+<div class="search-container">
+    <form role="search" method="get">
+        <input type="text" placeholder="Search.." name="q" id="searchbar">
+        <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+</div>
+
+{% if products|length != 0 %}
+<div>
+    <table border="1px solid black" width="100%" class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя</th>
+                <th>Описание</th>
+                <th>Фото</th>
+                <th>Стоимость</th>
+                <th>Количество</th>
+                <th>Категория</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr>
+                    <td><a href="{{ product.get_absolute_url }}">{{product.id}}</a></td>
+                    <td>{{product.name}}</td>
+                    <td>{{product.description|linebreaks}}</td>
+                    <td><img width="100%" src="{{ product.photo.url }}" alt="{{product.name}}"></td>
+                    <td>{{product.price}}</td>
+                    <td>{{product.total_amount}}</td>
+                    <td>{{product.category}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

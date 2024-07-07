@@ -1,0 +1,74 @@
+/* Product style */
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f4f4f4; /* Цвет фона */
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.product {
+  display: flex;
+  width: 60%;
+  background-color: #fff; /* Цвет фона блока товара */
+  border-radius: 8px; /* Скругление углов блока товара */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень блока товара */
+}
+
+.product-image {
+  flex: 1;
+  padding: 20px;
+}
+
+.product-image img {
+  max-width: 100%;
+  height: auto;
+}
+
+.product-details {
+  flex: 1;
+  padding: 20px;
+}
+
+.product-details h2 {
+  margin-top: 0;
+}
+
+.product-details p {
+  margin: 10px 0;
+}
+
+.product-details label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.product-details input[type="number"] {
+  width: 50px;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+.product-details button {
+  padding: 10px 20px;
+  background-color: #3582C4; /* Основной синий цвет */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.product-details button:hover {
+  background-color: #2271b1; /* Цвет кнопки при наведении */
+}
+
+.product-name {
+    color: #3582c4;
+
+}

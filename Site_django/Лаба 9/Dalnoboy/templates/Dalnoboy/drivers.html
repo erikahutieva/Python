@@ -1,0 +1,44 @@
+{% extends 'Dalnoboy/base.html' %}
+
+
+
+
+<div>
+    {% block content %}
+    <table border="0" width = "100%" align="center">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>ФИО</th>
+                <th>Пробег на всех авто.</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for driver in drivers %}
+            <tr>
+                <td>{{ driver.id }}</td>
+                <td>{{ driver.name }}</td>
+                <td>{{ driver.total_mileage }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    
+    <div style="border: 10px solid #ccc; padding: 20px; background-color: grey; margin-bottom: 20px;">
+        <form method="post" style="margin-right: 10px;">
+            {% csrf_token %}
+            {{ form1.as_p }}
+            <button type="submit" style="margin-top: 10px;">Добавить водителя</button>
+        </form>
+    </div>
+
+    <div style="border: 10px solid #ccc; padding: 20px; background-color: grey; margin-bottom: 20px;">
+        <form method="post">
+            {% csrf_token %}
+            {{ form2.as_p }}
+            <button type="submit" style="margin-top: 10px;">Удалить водителя</button>
+        </form>
+    </div>
+    {% endblock %}
+</div>

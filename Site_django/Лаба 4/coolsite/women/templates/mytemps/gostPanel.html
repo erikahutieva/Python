@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Панель гостевого пользователя</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #header {
+      background-color: #444;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    #container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #sidebar {
+      width: 25%;
+      background-color: #ccc;
+      padding: 10px;
+    }
+
+    #main {
+      width: 75%;
+      padding: 10px;
+    }
+
+    #widgets {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+
+    .widget {
+      width: 200px;
+      height: 200px;
+      background-color: #ccc;
+      border: 1px solid black;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px;
+    }
+
+    .widget-header {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .widget-content {
+      font-size: 14px;
+    }
+
+    .widget-button {
+      padding: 5px;
+      margin: 5px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <a href="{% url 'home' %}"><button> назад </button></a>
+  <div id="header">
+    <h1>Панель гостевого пользователя</h1>
+  </div>
+
+  <div id="container">
+    <div id="sidebar">
+      <h2>Меню</h2>
+      <ul>
+        <li><a href="#">Главная</a></li>
+        <li><a href="#">О нас</a></li>
+        <li><a href="#">Услуги</a></li>
+        <li><a href="#">Контакты</a></li>
+      </ul>
+    </div>
+
+    <div id="main">
+      <div id="widgets">
+        <div class="widget">
+          <div class="widget-header">Популярные статьи</div>
+          <div class="widget-content">
+            <ul>
+              <li><a href="#">Статья 1</a></li>
+              <li><a href="#">Статья 2</a></li>
+              <li><a href="#">Статья 3</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">Последние комментарии</div>
+          <div class="widget-content">
+            <ul>
+              <li>Иван Иванов: Отличный сайт!</li>
+              <li>Петр Петров: Очень информативный контент</li>
+              <li>Мария Мариина: Спасибо за полезную информацию</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">Социальные сети</div>
+          <div class="widget-content">
+            <ul>
+              <li><a href="#">Facebook</a></li>
+              <li><a href="#">Twitter</a></li>
+              <li><a href="#">Instagram</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">Подписка на рассылку</div>
+          <div class="widget-content">
+            <form>
+              <input type="email" placeholder="Введите ваш email">
+              <button type="submit">Подписаться</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

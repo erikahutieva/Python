@@ -1,0 +1,34 @@
+<!-- Конва нашего сайта -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        form {
+            color: white;
+        }
+    </style>
+    <title>Base Template</title>
+</head>
+<body>
+    <div>
+        <button onclick="location.href='/cars/'">Автомобили</button>
+        <button onclick="location.href='/drivers/'">Водители</button>
+        <button onclick="location.href='/trips/'">Поездки</button>
+        <button onclick="location.href='/admin/'">Admin Panel</button>
+        <button onclick="location.href='/cars_statistic/'", style = "background-color: blue;">Cars statistics</button>
+        <button onclick="location.href='/drivers_statistic/'", style = "background-color: blue;">Drivers statistics</button>
+        
+    </div>
+
+    <!-- Наша таблица и все формы... -->
+    <div>
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+{% if group.name == 'Полный доступ (для директора)' %}
+										<a href="{% url 'directorView' %}"><button> полный доступ </button></a>
+									{% endif %}
+
+									{% if group.name == 'Частичный доступ (для заместителя директора)' %}
+										<a href="{% url 'zamestitelView' %}"><button> частичный доступ </button></a>
+									{% endif %}
+
+									{% if group.name == 'Малый доступ (для секретаря)' %}
+										<a href="{% url 'secretarlView' %}"><button> малый доступ </button></a>
+									{% endif %}
+
+									{% if group.name == 'Пользовательский доступ (для гостя)' %}
+										<a href="{% url 'gostView' %}"><button> гостевой доступ </button></a>
+									{% endif %}
+
+
+
+
+    path('directorView/', showDirectorView, name='directorView'),
+    path('zamestitelView/', showZamestitelView, name='zamestitelView'),
+    path('secretarView/', showSecretarView, name='secretarlView'),
+    path('gostView/', showGostView, name='gostView'),
+
+
+
+def showDirectorView(request):
+    """contact_list = Women.objects.all()
+    paginator = Paginator(contact_list, 3)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)"""
+    return render(request, 'mytemps/directorPanel.html') # , {'page_obj': page_obj, 'menu': menu, 'title': 'О сайте'}
+
+def showZamestitelView(request):
+    """contact_list = Women.objects.all()
+    paginator = Paginator(contact_list, 3)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)"""
+    return render(request, 'mytemps/zamestitelPanel.html') # , {'page_obj': page_obj, 'menu': menu, 'title': 'О сайте'}
+
+def showSecretarView(request):
+    """contact_list = Women.objects.all()
+    paginator = Paginator(contact_list, 3)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)"""
+    return render(request, 'mytemps/secretarPanel.html') # , {'page_obj': page_obj, 'menu': menu, 'title': 'О сайте'}
+
+def showGostView(request):
+    """contact_list = Women.objects.all()
+    paginator = Paginator(contact_list, 3)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)"""
+    return render(request, 'mytemps/gostPanel.html') # , {'page_obj': page_obj, 'menu': menu, 'title': 'О сайте'}

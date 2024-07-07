@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'graphic/css/styles.css' %}">
+    <title>{{title}}</title>
+</head>
+<body>
+
+{% block content %}
+
+    <div class="form">
+        <form method="post">
+            {% csrf_token %}
+            <label for="x">Введите X:</label>
+            <input type="number" name="x" id="x" required><br>
+            <label for="y">Введите Y:</label>
+            <input type="number" name="y" id="y" required>
+            <input type="submit" value="Добавить точку">
+            <br>
+        </form>
+        <form method="post">
+            {% csrf_token %}
+            <p>Введите ограничения</p>
+            <label for="min">Введите левую границу для X:</label>
+            <input type="number" name="x_min">
+            <br>
+            <label for="max">Введите правую границу для X:</label>
+            <input type="number" name="x_max"><br>
+            <label for="min">Введите левую границу для Y:</label>
+            <input type="number" name="y_min">
+            <br>
+            <label for="max">Введите правую границу для Y:</label>
+            <input type="number" name="y_max"><br>
+            <input type="submit" value="Добавить ограничения">
+        </form>
+    </div>
+
+    {% if points %}
+        <h2>Точки:</h2>
+        <ul>
+            {% for point in points %}
+                <li>X: {{ point.x }}, Y: {{ point.y }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if img_url %}
+        <h2>График</h2>
+        <img src="{{ img_url }}" alt="График">
+    {% endif %}
+
+    {% if hist_url %}
+        <h2>Гистограмма</h2>
+        <img src="{{ hist_url }}" alt="Гистограмма">
+    {% endif %}
+
+    {% if pie_url %}
+        <h2>Круговая диаграмма</h2>
+        <img src="{{ pie_url }}" alt="Круговая диаграмма">
+    {% endif %}
+
+    <p><a href="{% url 'clear_graphic' %}">Очистить график</a></p>
+
+{% endblock %}
+
+</body>
+</html>

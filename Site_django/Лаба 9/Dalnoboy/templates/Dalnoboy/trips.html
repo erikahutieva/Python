@@ -1,0 +1,54 @@
+{% extends 'Dalnoboy/base.html' %}
+
+
+
+<div>
+    {% block content %}
+    <table border="0" width = "100%" align="center">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Водитель</th>
+                <th>Автомобиль</th>
+                <th>Время выезда</th>
+                <th>Время прибытия</th>
+                <th>Расстояние</th>
+                <th>Затраченное топливо</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trip in trips %}
+            <tr>
+                <td>{{ trip.id }}</td>
+                <td>{{ trip.driver }}</td>
+                <td>{{ trip.car }}</td>
+                <td>{{ trip.departure_time }}</td>
+                <td>{{ trip.arrival_time }}</td>
+                <td>{{ trip.distance }}</td>
+                <td>{{ trip.fuel_spent }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+    <div style="border: 10px solid #ccc; padding: 20px; background-color: grey; margin-bottom: 20px;">
+        <form method="post" style="margin-right: 10px;">
+            {% csrf_token %}
+            {{ form1.as_p }}
+            <button type="submit" style="margin-top: 10px;">Добавить поездку</button>
+        </form>
+    </div>
+
+    <div style="border: 10px solid #ccc; padding: 20px; background-color: grey; margin-bottom: 20px;">
+        <form method="post">
+            {% csrf_token %}
+            {{ form2.as_p }}
+            <button type="submit" style="margin-top: 10px;">Удалить поездку</button>
+        </form>
+    </div>
+    {% endblock %}
+</div>
+
+
