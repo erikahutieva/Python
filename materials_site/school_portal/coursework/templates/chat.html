@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with GPT</title>
+</head>
+<body>
+    <h1>Chat with GPT</h1>
+    <form id="chat-form">
+        <textarea id="user-message" placeholder="Type your message here..."></textarea>
+        <button type="submit">Send</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('chat-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const message = document.getElementById('user-message').value;
+
+            const response = await fetch('/chat/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message }),
+            });
+
+            const data = await response.json();
+            document.getElementById('response').innerText = data.response;
+        };
+    </script>
+</body>
+</html>
