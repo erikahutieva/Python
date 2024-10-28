@@ -143,24 +143,17 @@
         </form>
 
         <!-- Список загруженных PDF-файлов -->
-        <h3>Загруженные файлы:</h3>
+       
         <ul>
             {% for file in files %}
-                <li>
-                    <a href="{{ file.file.url }}" class="file-link">
-                        <i class="fas fa-file-pdf"></i> {{ file.file.name }}
-                    </a>
-                    
-                </li>
+              
             {% empty %}
                 <li>Файлы отсутствуют</li>
             {% endfor %}
         </ul>
         
 
-        <a href="{% url 'subject_list' teacher.subject.id %}" class="back-link">
-            <i class="fas fa-arrow-left"></i> Назад
-        </a>
+
     </div>
 </body>
 </html>

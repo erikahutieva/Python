@@ -125,7 +125,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Предметы по дисциплине: {{ discipline.name }}</h1>
+        <h1> {{ discipline.name }}</h1>
         <ul>
             {% for subject in subjects %}
                 <li><a href="{% url 'teacher_list' subject.id %}"><i class="fas fa-chalkboard-teacher"></i>{{ subject.name }}</a></li>

@@ -58,10 +58,15 @@
             transform: scale(1.05);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
         }
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
+        li a {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
         .container {
             background-color: rgba(255, 255, 255, 0.1);
             padding: 30px;
@@ -113,7 +118,7 @@
         </ul>
 
         <!-- Ссылки для загрузки нового файла и возврата к списку преподавателей -->
-        <a href="{% url 'upload_pdf' teacher.id %}" class="upload-link"><i class="fas fa-upload"></i> Загрузить новый PDF</a>
+        <a href="{% url 'upload_pdf' teacher.id %}" class="upload-link"><i class="fas fa-upload"></i> Загрузить новый файл</a>
         <br>
         <a href="{% url 'teacher_list' teacher.subject.id %}" class="back-link"><i class="fas fa-arrow-left"></i> Назад к предмету</a>
     </div>
