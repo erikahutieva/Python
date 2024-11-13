@@ -61,9 +61,3 @@ insert into contacts values (5,5,2,5,5,71,15,11,88227758538);
 insert into contacts values (6,5,5,3,5,71,15,11,88227777777);
 
 
-select *
-from contacts
-join last_name_inf on last_name_inf.fam_num=contacts.last_name
-join name_inf on name_num=contacts.name
-join otch_inf on otch_num=contacts.otch
-join street_inf on street_num=contacts.street

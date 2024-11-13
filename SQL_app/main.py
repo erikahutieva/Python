@@ -1,20 +1,29 @@
 import sys
 import psycopg2
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 
-def connect ():
+def connect():
     conn = psycopg2.connect(
-            dbname='postgres',
-            user='postgres',
-            password='1',
-            host='localhost',
-            port=5432
-        )
+        dbname='postgres',
+        user='postgres',
+        password='1',
+        host='localhost',
+        port=5432
+    )
     return conn
+
+def show_error(message):
+    # Create a QMessageBox to display the error message
+    error_dialog = QMessageBox()
+    error_dialog.setIcon(QMessageBox.Critical)  # Set the icon to Critical
+    error_dialog.setWindowTitle("Ошибка")       # Set the title of the window
+    error_dialog.setText(message)               # Set the error message
+    error_dialog.exec_()                        # Show the error window
 
 def main(query, params=None):
     try:
-        conn=connect()
+        conn = connect()
         cursor = conn.cursor()
 
         if params:
@@ -25,16 +34,16 @@ def main(query, params=None):
         if query.strip().upper().startswith("SELECT"):
             results = cursor.fetchall()
         else:
-            conn.commit()  
+            conn.commit()
             results = []
 
         cursor.close()
         conn.close()
         return results
     except Exception as e:
-        print(f"Error: {e}")
+        # Use QMessageBox to display the error message in a separate window
+        show_error(f"Error: {e}")
         return []
-
 def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
     conn = connect()
     cursor = conn.cursor()
