@@ -7,7 +7,7 @@ CREATE TABLE name_inf (
     name VARCHAR(30) UNIQUE
 );
 CREATE TABLE last_name_inf (
-    fam_num SERIAL PRIMARY KEY,
+    last_name_num SERIAL PRIMARY KEY,
     last_name VARCHAR(30) UNIQUE
 );
 CREATE TABLE otch_inf (
@@ -24,7 +24,7 @@ CREATE TABLE contacts (
     korp VARCHAR(10),
     room INT,
     phone VARCHAR(12),
-    FOREIGN KEY (last_name) REFERENCES last_name_inf (fam_num),
+    FOREIGN KEY (last_name) REFERENCES last_name_inf (last_name_num),
 	FOREIGN KEY (name) REFERENCES name_inf (name_num),
 	FOREIGN KEY (otch) REFERENCES otch_inf (otch_num),
 	FOREIGN KEY (street) REFERENCES street_inf (street_num)

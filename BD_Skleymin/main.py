@@ -2,52 +2,97 @@ import sys
 import psycopg2
 from PyQt5 import QtWidgets
 
-
-def main(ask, filter_ask):
-    try:
-        conn = psycopg2.connect(
+def connect ():
+    conn = psycopg2.connect(
             dbname='postgres',
             user='postgres',
             password='1',
             host='localhost',
             port=5432
         )
+    return conn
+
+def main(query, params=None):
+    try:
+        conn=connect()
         cursor = conn.cursor()
 
-        if filter_ask:
-            ask += " WHERE " + filter_ask
-        cursor.execute(ask)
-        results = cursor.fetchall()
+        if params:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+
+        if query.strip().upper().startswith("SELECT"):
+            results = cursor.fetchall()
+        else:
+            conn.commit()  
+            results = []
+
         cursor.close()
         conn.close()
         return results
-    except:
-        print("Error")
+    except Exception as e:
+        print(f"Error: {e}")
         return []
 
 
-def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
-
-    insert_query = f"""
-    INSERT INTO contacts (name, last_name, otch, street, stroenie, korp, room, phone)
-    VALUES ({name}, {last_name}, {otch}, {street}, {stroenie}, {korp}, {room}, {phone})
-    """
-    print("Record added successfully")
+def get_id(id, name):
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(f"""
+        SELECT {name}_inf.{name}_num
+        FROM contacts
+        JOIN {name}_inf ON {name}_inf.{name}_num = contacts.{name}
+        WHERE {name}_inf.{name} = %s
+    """, (id,))
+    fetched = cursor.fetchall()
+    cursor.close()
     
-    main(insert_query, None)
+    return fetched[0][0] 
+
+def all_id(name, last_name, otch, street):
+    columns = ["name", "last_name", "otch", "street"]
+    values = [name, last_name, otch, street]
+    result = []
+    for col, val in zip(columns, values):
+        result.append(get_id(val, col))
+
+    if all(result):
+        name, last_name, otch, street = map(int, result)
+        return name, last_name, otch, street
+    else:
+        print("Не найдено совпадений")
+        return
+
+def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
+    conn = connect()
+    cursor = conn.cursor()
+    name, last_name, otch, street = all_id(name, last_name, otch, street)
+    insert_query = """
+    INSERT INTO contacts (name, last_name, otch, street, stroenie, korp, room, phone)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    params = (name, last_name, otch, street, stroenie, korp, room, phone)
+    main(insert_query, params)
+
+    print("Record added successfully")
 
 
 
-def delete_record(record_id):
-    delete_query = f"DELETE FROM contacts WHERE id = {record_id}"
-    main(delete_query,None)
+def delete_record(name, last_name, otch, street, stroenie, korp, room, phone):
+    name, last_name, otch, street = all_id(name, last_name, otch, street)
+    params=[name, last_name, otch, street]
+    for i in params:
+        delete_query = f"DELETE FROM contacts WHERE "
+    main(delete_query, (record_id,))
+    print("Record deleted successfully")
 
 
 def filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter):
     ask = """SELECT contacts.id, name_inf.name, last_name_inf.last_name, otch_inf.otch, street_inf.street, 
                 contacts.stroenie, contacts.korp, contacts.room, contacts.phone 
                 FROM contacts
-                JOIN last_name_inf ON last_name_inf.fam_num = contacts.last_name
+                JOIN last_name_inf ON last_name_inf.last_name_num = contacts.last_name
                 JOIN name_inf ON name_num = contacts.name
                 JOIN otch_inf ON otch_num = contacts.otch
                 JOIN street_inf ON street_num = contacts.street"""
@@ -127,13 +172,14 @@ def interface():
     phone_filter.setPlaceholderText("Телефон")
     filter_layout.addWidget(phone_filter)
 
-    # Button to apply filter
     filter_button = QtWidgets.QPushButton("Применить фильтр")
     filter_button.clicked.connect(lambda: filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter))
     filter_layout.addWidget(filter_button)
 
     # Button to add a new record
     add_button = QtWidgets.QPushButton("Добавить запись")
+
+
     add_button.clicked.connect(lambda: add_record(
         name_filter.text(),
         last_name_filter.text(),
@@ -148,7 +194,16 @@ def interface():
 
     # Button to delete a selected record
     delete_button = QtWidgets.QPushButton("Удалить запись")
-    delete_button.clicked.connect(lambda: delete_record(int(table.currentItem().text()) if table.currentItem() else None))
+    delete_button.clicked.connect(lambda: delete_record(
+        name_filter.text(),
+        last_name_filter.text(),
+        otch_filter.text(),
+        street_filter.text(),
+        str_filter.text(),
+        korp_filter.text(),
+        room_filter.text(),
+        phone_filter.text()  # Current column index
+))
     filter_layout.addWidget(delete_button)
 
     layout.addLayout(filter_layout)
