@@ -71,11 +71,15 @@ def all_id(name, last_name, otch, street):
 def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
     conn = connect()
     cursor = conn.cursor()
+    if len(phone)!=11: 
+        print("=11")
+        return
     name, last_name, otch, street = all_id(name, last_name, otch, street)
     insert_query = """
-    INSERT INTO contacts (name, last_name, otch, street, stroenie, korp, room, phone)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-    """
+INSERT INTO contacts (id, name, last_name, otch, street, stroenie, korp, room, phone)
+VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM contacts), %s, %s, %s, %s, %s, %s, %s, %s)
+"""
+
     params = (name, last_name, otch, street, stroenie, korp, room, phone)
     main(insert_query, params)
 
