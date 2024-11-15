@@ -35,7 +35,6 @@ def main(query, params=None):
         print(f"Error: {e}")
         return []
 
-
 def get_id(id, name):
     conn = connect()
     cursor = conn.cursor()
@@ -47,22 +46,27 @@ def get_id(id, name):
     """, (id,))
     fetched = cursor.fetchall()
     cursor.close()
-    
-    return fetched[0][0] 
+    conn.close()  # Don't forget to close the connection
+
+    if not fetched:  # Check if the list is empty
+        return None  # Return None if no match is found
+
+    return fetched[0][0]
 
 def all_id(name, last_name, otch, street):
     columns = ["name", "last_name", "otch", "street"]
     values = [name, last_name, otch, street]
     result = []
-    for col, val in zip(columns, values):
-        result.append(get_id(val, col))
 
-    if all(result):
-        name, last_name, otch, street = map(int, result)
-        return name, last_name, otch, street
-    else:
-        print("Не найдено совпадений")
-        return
+    for col, val in zip(columns, values):
+        id_value = get_id(val, col)
+        if id_value is None:  # If no matching record is found
+            id_value=0
+        result.append(id_value)
+
+    name, last_name, otch, street = map(int, result)
+    return name, last_name, otch, street
+
 
 def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
     conn = connect()
@@ -77,15 +81,62 @@ def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
 
     print("Record added successfully")
 
-
-
 def delete_record(name, last_name, otch, street, stroenie, korp, room, phone):
-    name, last_name, otch, street = all_id(name, last_name, otch, street)
-    params=[name, last_name, otch, street]
-    for i in params:
-        delete_query = f"DELETE FROM contacts WHERE "
-    main(delete_query, (record_id,))
-    print("Record deleted successfully")
+    ids = all_id(name, last_name, otch, street)
+    if ids is None:
+        print("Deletion aborted: No matching record found.")
+        return
+
+    # Unpack IDs
+    name, last_name, otch, street = ids
+
+    # Collect parameters and their corresponding column names
+    params = []
+    filters = []
+
+    if name:
+        filters.append("name = %s")
+        params.append(name)
+    if last_name:
+        filters.append("last_name = %s")
+        params.append(last_name)
+    if otch:
+        filters.append("otch = %s")
+        params.append(otch)
+    if street:
+        filters.append("street = %s")
+        params.append(street)
+    if stroenie:
+        filters.append("stroenie = %s")
+        params.append(stroenie)
+    if korp:
+        filters.append("korp = %s")
+        params.append(korp)
+    if room:
+        filters.append("room = %s")
+        params.append(room)
+    if phone:
+        filters.append("phone = %s")
+        params.append(phone)
+
+    # Construct the WHERE clause
+    filter_clause = " AND ".join(filters)
+
+    if not filter_clause:
+        print("No filters provided for deletion.")
+        return
+
+    # Final delete query
+    delete_query = f"DELETE FROM contacts WHERE {filter_clause}"
+    
+    try:
+        main(delete_query, tuple(params))
+        print("Record deleted successfully")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+
 
 
 def filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter):
@@ -115,7 +166,7 @@ def filter_table(table, name_filter, last_name_filter, otch_filter, street_filte
     if phone_filter.text():
         filters.append(f"contacts.phone LIKE '%{phone_filter.text()}%'")
 
-    filter_query = " AND ".join(filters) if filters else None
+    filter_query = " AND ".join(filters) 
 
     # Load new data
     data = main(ask,filter_query)
