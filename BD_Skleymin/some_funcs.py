@@ -24,7 +24,10 @@ def get_id(id, name):
     """, (id,))
     fetched = cursor.fetchall()
     cursor.close()
-    conn.close()  
+    conn.close()  # Don't forget to close the connection
+
+    if not fetched:  # Check if the list is empty
+        return None  # Return None if no match is found
 
     return fetched[0][0]
 
@@ -35,7 +38,7 @@ def all_id(name, last_name, otch, street):
 
     for col, val in zip(columns, values):
         id_value = get_id(val, col)
-        if id_value is None:  
+        if id_value is None:  # If no matching record is found
             id_value=0
         result.append(id_value)
 
