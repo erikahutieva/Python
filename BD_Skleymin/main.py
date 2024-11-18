@@ -15,7 +15,7 @@ def sql_record(query, params=None):
         if query.strip().upper().startswith("SELECT"):
             results = cursor.fetchall()
         else:
-            conn.commit()  
+            conn.commit() #фиксируем изменения в бд
             results = []
 
         cursor.close()
@@ -30,7 +30,7 @@ def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
     conn = connect()
     cursor = conn.cursor()
     if len(phone)!=11: 
-        print("=11")
+        print("Введите номер 11-значный номер телефона")
         return
     name, last_name, otch, street = all_id(name, last_name, otch, street)
     insert_query = """
@@ -41,15 +41,13 @@ VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM contacts), %s, %s, %s, %s, %s, %s,
     params = (name, last_name, otch, street, stroenie, korp, room, phone)
     sql_record(insert_query, params)
 
-    print("Record added successfully")
 
 def delete_record(name, last_name, otch, street, stroenie, korp, room, phone):
     ids = all_id(name, last_name, otch, street)
     if ids is None:
-        print("Deletion aborted: No matching record found.")
+        print("Нечего удалять")
         return
 
-    # Unpack IDs
     name, last_name, otch, street = ids
 
     params = []
@@ -80,21 +78,16 @@ def delete_record(name, last_name, otch, street, stroenie, korp, room, phone):
         filters.append("phone = %s")
         params.append(phone)
 
-    # Construct the WHERE clause
+
     filter_clause = " AND ".join(filters)
 
     if not filter_clause:
-        print("No filters provided for deletion.")
+        print("Нет фильтров")
         return
 
-    # Final delete query
+
     delete_query = f"DELETE FROM contacts WHERE {filter_clause}"
     
-    try:
-        sql_record(delete_query, tuple(params))
-        print("Record deleted successfully")
-    except Exception as e:
-        print(f"Error: {e}")
 
 def filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter):
     ask = """SELECT contacts.id, name_inf.name, last_name_inf.last_name, otch_inf.otch, street_inf.street, 
