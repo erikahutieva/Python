@@ -41,22 +41,19 @@ VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM contacts), %s, %s, %s, %s, %s, %s,
 
 
     params = (name, last_name, otch, street, stroenie, korp, room, phone)
-    sql_record(insert_query, params)  # Выполняем запрос
+    sql_record(insert_query, params) 
 
-    print("Запись успешно добавлена")  # Выводим сообщение об успешном добавлении
+    print("Запись добавлена")  
 
 def delete_record(name, last_name, otch, street, stroenie, korp, room, phone):
-    # Получаем идентификаторы имени, фамилии, отчества и улицы
     ids = all_id(name, last_name, otch, street)
     
     if ids is None:
-        print("Удаление прервано: запись не найдена.")
+        print("Запись не найдена.")
         return
 
-    # Распаковываем идентификаторы
     name, last_name, otch, street = ids
 
-    # Собираем параметры и соответствующие названия столбцов
     params = []
     filters = []
 
@@ -85,61 +82,65 @@ def delete_record(name, last_name, otch, street, stroenie, korp, room, phone):
         filters.append("phone = %s")
         params.append(phone)
 
-    # Создаем условие WHERE
     filter_clause = " AND ".join(filters)
 
     if not filter_clause:
         print("Не указаны параметры для удаления.")
         return
 
-    # Финальный запрос на удаление
     delete_query = f"DELETE FROM contacts WHERE {filter_clause}"
     
     try:
-        sql_record(delete_query, tuple(params))  # Выполняем запрос
-        print("Запись успешно удалена")  # Выводим сообщение об успешном удалении
+        sql_record(delete_query, tuple(params)) 
+        print("Запись удалена")  
     except Exception as e:
-        print(f"Ошибка: {e}")  # Выводим сообщение об ошибке
+        print(f"Ошибка: {e}")  
 
 def filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter):
-    # SQL-запрос для выборки данных из базы
-    ask = """SELECT contacts.id, name_inf.name, last_name_inf.last_name, otch_inf.otch, street_inf.street, 
-                contacts.stroenie, contacts.korp, contacts.room, contacts.phone 
-                FROM contacts
-                JOIN last_name_inf ON last_name_inf.last_name_num = contacts.last_name
-                JOIN name_inf ON name_num = contacts.name
-                JOIN otch_inf ON otch_num = contacts.otch
-                JOIN street_inf ON street_num = contacts.street"""
+    base_query = """SELECT contacts.id, name_inf.name, last_name_inf.last_name, otch_inf.otch, street_inf.street, 
+                    contacts.stroenie, contacts.korp, contacts.room, contacts.phone 
+                    FROM contacts
+                    JOIN last_name_inf ON last_name_inf.last_name_num = contacts.last_name
+                    JOIN name_inf ON name_num = contacts.name
+                    JOIN otch_inf ON otch_num = contacts.otch
+                    JOIN street_inf ON street_num = contacts.street"""
 
-    # Создаем фильтры для запроса
     filters = []
+    params = []
+
     if name_filter.text():
-        filters.append(f"name_inf.name ILIKE '%{name_filter.text()}%'")
+        filters.append("name_inf.name ILIKE %s")
+        params.append(f"%{name_filter.text()}%")
     if last_name_filter.text():
-        filters.append(f"last_name_inf.last_name ILIKE '%{last_name_filter.text()}%'")
+        filters.append("last_name_inf.last_name ILIKE %s")
+        params.append(f"%{last_name_filter.text()}%")
     if otch_filter.text():
-        filters.append(f"otch_inf.otch ILIKE '%{otch_filter.text()}%'")
+        filters.append("otch_inf.otch ILIKE %s")
+        params.append(f"%{otch_filter.text()}%")
     if street_filter.text():
-        filters.append(f"street_inf.street ILIKE '%{street_filter.text()}%'")
+        filters.append("street_inf.street ILIKE %s")
+        params.append(f"%{street_filter.text()}%")
     if str_filter.text():
-        filters.append(f"contacts.stroenie ILIKE '%{str_filter.text()}%'")
+        filters.append("contacts.stroenie ILIKE %s")
+        params.append(f"%{str_filter.text()}%")
     if korp_filter.text():
-        filters.append(f"contacts.korp LIKE '%{korp_filter.text()}%'")
+        filters.append("contacts.korp LIKE %s")
+        params.append(f"%{korp_filter.text()}%")
     if room_filter.text():
-        filters.append(f"contacts.room = {int(room_filter.text())}")
+        filters.append("contacts.room = %s")
+        params.append(int(room_filter.text()))
     if phone_filter.text():
-        filters.append(f"contacts.phone LIKE '%{phone_filter.text()}%'")
+        filters.append("contacts.phone LIKE %s")
+        params.append(f"%{phone_filter.text()}%")
 
-    # Формируем запрос с фильтрами
-    filter_query = " AND ".join(filters) 
+    if filters:
+        base_query += " WHERE " + " AND ".join(filters)
 
-    # Загружаем новые данные
-    data = sql_record(ask, filter_query)
+ 
+    data = sql_record(base_query, params)
+    table.setRowCount(0) # Очищаем таблицу
 
-    # Очищаем таблицу
-    table.setRowCount(0)
 
-    # Заполняем таблицу новыми данными
     for row_data in data:
         row_number = table.rowCount()
         table.insertRow(row_number)
@@ -148,13 +149,13 @@ def filter_table(table, name_filter, last_name_filter, otch_filter, street_filte
 
 def interface():
     window = QtWidgets.QWidget()  # Создаем окно
-    window.setWindowTitle('Телефонный справочник')  # Устанавливаем заголовок окна
-    window.setGeometry(100, 100, 800, 400)  # Устанавливаем размер и положение окна
+    window.setWindowTitle('Телефонный справочник') 
+    window.setGeometry(100, 100, 800, 400)  
 
-    layout = QtWidgets.QVBoxLayout(window)  # Основной вертикальный макет
-    filter_layout = QtWidgets.QHBoxLayout()  # Горизонтальный макет для фильтров
+    layout = QtWidgets.QVBoxLayout(window)  # вертикальный макет
+    filter_layout = QtWidgets.QHBoxLayout()  # Горизонтальный макет 
 
-    # Создаем поля ввода для фильтров
+    # для фильтров
     name_filter = QtWidgets.QLineEdit()
     name_filter.setPlaceholderText("Имя")
     filter_layout.addWidget(name_filter)
@@ -187,12 +188,12 @@ def interface():
     phone_filter.setPlaceholderText("Телефон")
     filter_layout.addWidget(phone_filter)
 
-    # Кнопка для применения фильтров
+
     filter_button = QtWidgets.QPushButton("Применить фильтр")
     filter_button.clicked.connect(lambda: filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter))
     filter_layout.addWidget(filter_button)
 
-    # Кнопка для добавления новой записи
+
     add_button = QtWidgets.QPushButton("Добавить запись")
     add_button.clicked.connect(lambda: add_record(
         name_filter.text(),
@@ -206,7 +207,7 @@ def interface():
     ))
     filter_layout.addWidget(add_button)
 
-    # Кнопка для удаления выбранной записи
+
     delete_button = QtWidgets.QPushButton("Удалить запись")
     delete_button.clicked.connect(lambda: delete_record(
         name_filter.text(),
@@ -216,6 +217,24 @@ def interface():
         str_filter.text(),
         korp_filter.text(),
         room_filter.text(),
-        phone_filter.text()
-    ))
-   
+        phone_filter.text()  
+))
+    filter_layout.addWidget(delete_button)
+
+    layout.addLayout(filter_layout)
+
+
+    table = QtWidgets.QTableWidget()
+    table.setColumnCount(9)
+    table.setHorizontalHeaderLabels(["ID", "Имя", "Фамилия", "Отчество", "Улица", "Строение", "Корпус", "Квартира", "Телефон"])
+    layout.addWidget(table)
+
+    filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter)
+
+    return window
+
+
+app = QtWidgets.QApplication(sys.argv)
+window = interface()
+window.show()
+sys.exit(app.exec_())
