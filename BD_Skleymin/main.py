@@ -1,18 +1,8 @@
-import sys
-import psycopg2
-from PyQt5 import QtWidgets
 
-def connect ():
-    conn = psycopg2.connect(
-            dbname='postgres',
-            user='postgres',
-            password='1',
-            host='localhost',
-            port=5432
-        )
-    return conn
+from some_funcs import *
 
-def main(query, params=None):
+
+def sql_record(query, params=None):
     try:
         conn=connect()
         cursor = conn.cursor()
@@ -35,38 +25,6 @@ def main(query, params=None):
         print(f"Error: {e}")
         return []
 
-def get_id(id, name):
-    conn = connect()
-    cursor = conn.cursor()
-    cursor.execute(f"""
-        SELECT {name}_inf.{name}_num
-        FROM contacts
-        JOIN {name}_inf ON {name}_inf.{name}_num = contacts.{name}
-        WHERE {name}_inf.{name} = %s
-    """, (id,))
-    fetched = cursor.fetchall()
-    cursor.close()
-    conn.close()  # Don't forget to close the connection
-
-    if not fetched:  # Check if the list is empty
-        return None  # Return None if no match is found
-
-    return fetched[0][0]
-
-def all_id(name, last_name, otch, street):
-    columns = ["name", "last_name", "otch", "street"]
-    values = [name, last_name, otch, street]
-    result = []
-
-    for col, val in zip(columns, values):
-        id_value = get_id(val, col)
-        if id_value is None:  # If no matching record is found
-            id_value=0
-        result.append(id_value)
-
-    name, last_name, otch, street = map(int, result)
-    return name, last_name, otch, street
-
 
 def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
     conn = connect()
@@ -81,7 +39,7 @@ VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM contacts), %s, %s, %s, %s, %s, %s,
 """
 
     params = (name, last_name, otch, street, stroenie, korp, room, phone)
-    main(insert_query, params)
+    sql_record(insert_query, params)
 
     print("Record added successfully")
 
@@ -94,7 +52,6 @@ def delete_record(name, last_name, otch, street, stroenie, korp, room, phone):
     # Unpack IDs
     name, last_name, otch, street = ids
 
-    # Collect parameters and their corresponding column names
     params = []
     filters = []
 
@@ -134,14 +91,10 @@ def delete_record(name, last_name, otch, street, stroenie, korp, room, phone):
     delete_query = f"DELETE FROM contacts WHERE {filter_clause}"
     
     try:
-        main(delete_query, tuple(params))
+        sql_record(delete_query, tuple(params))
         print("Record deleted successfully")
     except Exception as e:
         print(f"Error: {e}")
-
-
-
-
 
 def filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter):
     ask = """SELECT contacts.id, name_inf.name, last_name_inf.last_name, otch_inf.otch, street_inf.street, 
@@ -172,19 +125,17 @@ def filter_table(table, name_filter, last_name_filter, otch_filter, street_filte
 
     filter_query = " AND ".join(filters) 
 
-    # Load new data
-    data = main(ask,filter_query)
+    data = sql_record(ask,filter_query)
 
-    # Clear the table
+
     table.setRowCount(0)
 
-    # Populate the table with new data
+
     for row_data in data:
         row_number = table.rowCount()
         table.insertRow(row_number)
         for column_number, value in enumerate(row_data):
             table.setItem(row_number, column_number, QtWidgets.QTableWidgetItem(str(value)))
-
 
 def interface():
     window = QtWidgets.QWidget()
@@ -194,7 +145,6 @@ def interface():
     layout = QtWidgets.QVBoxLayout(window)
     filter_layout = QtWidgets.QHBoxLayout()
 
-    # Create input fields for filters
     name_filter = QtWidgets.QLineEdit()
     name_filter.setPlaceholderText("Имя")
     filter_layout.addWidget(name_filter)
@@ -231,7 +181,7 @@ def interface():
     filter_button.clicked.connect(lambda: filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter))
     filter_layout.addWidget(filter_button)
 
-    # Button to add a new record
+
     add_button = QtWidgets.QPushButton("Добавить запись")
 
 
@@ -247,7 +197,7 @@ def interface():
     ))
     filter_layout.addWidget(add_button)
 
-    # Button to delete a selected record
+
     delete_button = QtWidgets.QPushButton("Удалить запись")
     delete_button.clicked.connect(lambda: delete_record(
         name_filter.text(),
@@ -257,19 +207,18 @@ def interface():
         str_filter.text(),
         korp_filter.text(),
         room_filter.text(),
-        phone_filter.text()  # Current column index
+        phone_filter.text()  
 ))
     filter_layout.addWidget(delete_button)
 
     layout.addLayout(filter_layout)
 
-    # Table to display data
+
     table = QtWidgets.QTableWidget()
     table.setColumnCount(9)
     table.setHorizontalHeaderLabels(["ID", "Имя", "Фамилия", "Отчество", "Улица", "Строение", "Корпус", "Квартира", "Телефон"])
     layout.addWidget(table)
 
-    # Populate the table on startup
     filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter)
 
     return window
