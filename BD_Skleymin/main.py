@@ -188,6 +188,9 @@ def interface():
     phone_filter.setPlaceholderText("Телефон")
     filter_layout.addWidget(phone_filter)
 
+    clear_button = QtWidgets.QPushButton("Очистить поля")
+    clear_button.clicked.connect(lambda: clear_fields([name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter]))
+    filter_layout.addWidget(clear_button)
 
     filter_button = QtWidgets.QPushButton("Применить фильтр")
     filter_button.clicked.connect(lambda: filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter))

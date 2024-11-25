@@ -45,4 +45,6 @@ def all_id(name, last_name, otch, street):
     name, last_name, otch, street = map(int, result)
     return name, last_name, otch, street
 
-
+def clear_fields(fields):
+    for field in fields:
+        field.clear()
