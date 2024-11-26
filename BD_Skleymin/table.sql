@@ -67,3 +67,11 @@ join last_name_inf on last_name_inf.last_name_num=contacts.last_name
 join name_inf on name_num=contacts.name
 join otch_inf on otch_num=contacts.otch
 join street_inf on street_num=contacts.street
+
+/*
+
+DROP TABLE contacts;
+DROP TABLE last_name_inf;
+DROP TABLE name_inf;
+DROP TABLE otch_inf;
+DROP TABLE street_inf;*/

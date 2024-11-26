@@ -1,6 +1,20 @@
 import sys
 import psycopg2
+from PyQt5.QtWidgets import (
+    QApplication, 
+    QComboBox, 
+    QTableWidget, 
+    QTableWidgetItem, 
+    QVBoxLayout, 
+    QWidget, 
+    QLineEdit, 
+    QPushButton, 
+    QHBoxLayout
+)
+import sys
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QComboBox
+
 
 def connect ():
     conn = psycopg2.connect(
@@ -48,3 +62,5 @@ def all_id(name, last_name, otch, street):
 def clear_fields(fields):
     for field in fields:
         field.clear()
+
+

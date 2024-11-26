@@ -26,12 +26,33 @@ def sql_record(query, params):
 def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
     conn = connect()  
     cursor = conn.cursor() 
-
-    if len(phone) != 11:  
-        print("Телефон должен состоять из 11 цифр")
+    ids = all_id(name, last_name, otch, street)
+    
+    if ids is None:
+        print("Запись не найдена.")
         return
 
-    name, last_name, otch, street = all_id(name, last_name, otch, street)
+    name, last_name, otch, street = ids
+
+    unic = """
+    SELECT 1 
+    FROM contacts 
+    WHERE name = %s 
+    AND last_name = %s 
+    AND otch = %s 
+    AND street = %s 
+    AND stroenie = %s 
+    AND korp = %s 
+    AND room = %s 
+    AND phone = %s
+
+    """
+    params = (name, last_name, otch, street, stroenie, korp, room, phone)
+    results=sql_record(unic, params)
+    if len(phone) != 11 or results:  
+        print("Введите корректные данные")
+        return
+
     
 
     insert_query = """
@@ -44,6 +65,7 @@ VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM contacts), %s, %s, %s, %s, %s, %s,
     sql_record(insert_query, params) 
 
     print("Запись добавлена")  
+    interface()
 
 def delete_record(name, last_name, otch, street, stroenie, korp, room, phone):
     ids = all_id(name, last_name, otch, street)
@@ -108,18 +130,18 @@ def filter_table(table, name_filter, last_name_filter, otch_filter, street_filte
     filters = []
     params = []
 
-    if name_filter.text():
+    if name_filter.currentText():
         filters.append("name_inf.name ILIKE %s")
-        params.append(f"%{name_filter.text()}%")
-    if last_name_filter.text():
+        params.append(f"%{name_filter.currentText()}%")
+    if last_name_filter.currentText():
         filters.append("last_name_inf.last_name ILIKE %s")
-        params.append(f"%{last_name_filter.text()}%")
-    if otch_filter.text():
+        params.append(f"%{last_name_filter.currentText()}%")
+    if otch_filter.currentText():
         filters.append("otch_inf.otch ILIKE %s")
-        params.append(f"%{otch_filter.text()}%")
-    if street_filter.text():
+        params.append(f"%{otch_filter.currentText()}%")
+    if street_filter.currentText():
         filters.append("street_inf.street ILIKE %s")
-        params.append(f"%{street_filter.text()}%")
+        params.append(f"%{street_filter.currentText()}%")
     if str_filter.text():
         filters.append("contacts.stroenie ILIKE %s")
         params.append(f"%{str_filter.text()}%")
@@ -147,29 +169,46 @@ def filter_table(table, name_filter, last_name_filter, otch_filter, street_filte
         for column_number, value in enumerate(row_data):
             table.setItem(row_number, column_number, QtWidgets.QTableWidgetItem(str(value)))
 
+
+class AlwaysOpenComboBox(QComboBox):
+    def focusInEvent(self, event):
+        super().focusInEvent(event)  # Сначала вызываем стандартное поведение
+        self.showPopup()
+
+
 def interface():
-    window = QtWidgets.QWidget()  # Создаем окно
-    window.setWindowTitle('Телефонный справочник') 
-    window.setGeometry(100, 100, 800, 400)  
+    """Основное окно интерфейса."""
+    window = QWidget()
 
-    layout = QtWidgets.QVBoxLayout(window)  # вертикальный макет
-    filter_layout = QtWidgets.QHBoxLayout()  # Горизонтальный макет 
+    window.setWindowTitle('Телефонный справочник')
+    window.setGeometry(100, 100, 800, 400)
 
-    # для фильтров
-    name_filter = QtWidgets.QLineEdit()
-    name_filter.setPlaceholderText("Имя")
+    layout = QtWidgets.QVBoxLayout(window)
+    filter_layout = QtWidgets.QHBoxLayout()
+
+    # Поля фильтрации
+    name_filter = AlwaysOpenComboBox()
+    name_filter.setEditable(True)
+    name_filter.addItems([name[0] for name in sql_record("SELECT DISTINCT name FROM name_inf", None)])
+    name_filter.setCurrentIndex(-1)
     filter_layout.addWidget(name_filter)
 
-    last_name_filter = QtWidgets.QLineEdit()
-    last_name_filter.setPlaceholderText("Фамилия")
+    last_name_filter = AlwaysOpenComboBox()
+    last_name_filter.setEditable(True)
+    last_name_filter.addItems([last_name[0] for last_name in sql_record("SELECT DISTINCT last_name FROM last_name_inf", None)])
+    last_name_filter.setCurrentIndex(-1)
     filter_layout.addWidget(last_name_filter)
 
-    otch_filter = QtWidgets.QLineEdit()
-    otch_filter.setPlaceholderText("Отчество")
+    otch_filter = AlwaysOpenComboBox()
+    otch_filter.setEditable(True)
+    otch_filter.addItems([otch[0] for otch in sql_record("SELECT DISTINCT otch FROM otch_inf", None)])
+    otch_filter.setCurrentIndex(-1)
     filter_layout.addWidget(otch_filter)
 
-    street_filter = QtWidgets.QLineEdit()
-    street_filter.setPlaceholderText("Улица")
+    street_filter = AlwaysOpenComboBox()
+    street_filter.setEditable(True)
+    street_filter.addItems([street[0] for street in sql_record("SELECT DISTINCT street FROM street_inf", None)])
+    street_filter.setCurrentIndex(-1)
     filter_layout.addWidget(street_filter)
 
     str_filter = QtWidgets.QLineEdit()
@@ -188,21 +227,22 @@ def interface():
     phone_filter.setPlaceholderText("Телефон")
     filter_layout.addWidget(phone_filter)
 
-    clear_button = QtWidgets.QPushButton("Очистить поля")
-    clear_button.clicked.connect(lambda: clear_fields([name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter]))
-    filter_layout.addWidget(clear_button)
+    
 
     filter_button = QtWidgets.QPushButton("Применить фильтр")
     filter_button.clicked.connect(lambda: filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter))
     filter_layout.addWidget(filter_button)
 
+    clear_button = QtWidgets.QPushButton("Очистить поля")
+    clear_button.clicked.connect(lambda: clear_fields([str_filter, korp_filter, room_filter, phone_filter]))
+    filter_layout.addWidget(clear_button)
 
     add_button = QtWidgets.QPushButton("Добавить запись")
     add_button.clicked.connect(lambda: add_record(
-        name_filter.text(),
-        last_name_filter.text(),
-        otch_filter.text(),
-        street_filter.text(),
+        name_filter.currentText(),
+        last_name_filter.currentText(),
+        otch_filter.currentText(),
+        street_filter.currentText(),
         str_filter.text(),
         korp_filter.text(),
         room_filter.text(),
@@ -213,10 +253,10 @@ def interface():
 
     delete_button = QtWidgets.QPushButton("Удалить запись")
     delete_button.clicked.connect(lambda: delete_record(
-        name_filter.text(),
-        last_name_filter.text(),
-        otch_filter.text(),
-        street_filter.text(),
+        name_filter.currentText(),
+        last_name_filter.currentText(),
+        otch_filter.currentText(),
+        street_filter.currentText(),
         str_filter.text(),
         korp_filter.text(),
         room_filter.text(),
@@ -237,7 +277,7 @@ def interface():
     return window
 
 
-app = QtWidgets.QApplication(sys.argv)
+app = QApplication(sys.argv)
 window = interface()
 window.show()
 sys.exit(app.exec_())
