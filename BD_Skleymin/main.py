@@ -49,7 +49,7 @@ def add_record(name, last_name, otch, street, stroenie, korp, room, phone):
     """
     params = (name, last_name, otch, street, stroenie, korp, room, phone)
     results=sql_record(unic, params)
-    if len(phone) != 11 or results:  
+    if len(phone) != 11 or results or not phone.isdigit() :  
         print("Введите корректные данные")
         return
 
@@ -172,12 +172,31 @@ def filter_table(table, name_filter, last_name_filter, otch_filter, street_filte
 
 class AlwaysOpenComboBox(QComboBox):
     def focusInEvent(self, event):
-        super().focusInEvent(event)  # Сначала вызываем стандартное поведение
+        super().focusInEvent(event) 
         self.showPopup()
 
 
+def show_all_records(table):
+    base_query = """SELECT contacts.id, name_inf.name, last_name_inf.last_name, otch_inf.otch, street_inf.street, 
+                    contacts.stroenie, contacts.korp, contacts.room, contacts.phone 
+                    FROM contacts
+                    JOIN last_name_inf ON last_name_inf.last_name_num = contacts.last_name
+                    JOIN name_inf ON name_num = contacts.name
+                    JOIN otch_inf ON otch_num = contacts.otch
+                    JOIN street_inf ON street_num = contacts.street"""
+    
+    data = sql_record(base_query, None)
+    table.setRowCount(0)  
+
+    for row_data in data:
+        row_number = table.rowCount()
+        table.insertRow(row_number)
+        for column_number, value in enumerate(row_data):
+            table.setItem(row_number, column_number, QtWidgets.QTableWidgetItem(str(value)))
+
+
 def interface():
-    """Основное окно интерфейса."""
+
     window = QWidget()
 
     window.setWindowTitle('Телефонный справочник')
@@ -186,7 +205,6 @@ def interface():
     layout = QtWidgets.QVBoxLayout(window)
     filter_layout = QtWidgets.QHBoxLayout()
 
-    # Поля фильтрации
     name_filter = AlwaysOpenComboBox()
     name_filter.setEditable(True)
     name_filter.addItems([name[0] for name in sql_record("SELECT DISTINCT name FROM name_inf", None)])
@@ -266,13 +284,18 @@ def interface():
 
     layout.addLayout(filter_layout)
 
+    show_all_button = QtWidgets.QPushButton("Показать все записи")
+    show_all_button.clicked.connect(lambda: show_all_records(table))
+    filter_layout.addWidget(show_all_button)
+
+    layout.addLayout(filter_layout)
 
     table = QtWidgets.QTableWidget()
     table.setColumnCount(9)
     table.setHorizontalHeaderLabels(["ID", "Имя", "Фамилия", "Отчество", "Улица", "Строение", "Корпус", "Квартира", "Телефон"])
     layout.addWidget(table)
 
-    filter_table(table, name_filter, last_name_filter, otch_filter, street_filter, str_filter, korp_filter, room_filter, phone_filter)
+    show_all_records(table)
 
     return window
 
